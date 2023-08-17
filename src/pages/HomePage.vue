@@ -1,64 +1,54 @@
-<template>
-  <div>
-    <div class="nav">
-      Сортировка по:
-      <select>
-        <option value="none">Нет</option>
-        <option value="price">Цена</option>
-        <option value="rating">Рейтинг</option>
-      </select>
-      <select>
-        <option value="min-to-max">По возрастанию</option>
-        <option value="max-to-min">По убыванию</option>
-      </select>
-    </div>
-    <div class="nav">
-      Фильтр по названию:
-      <input type="text" />
-    </div>
-    <hr />
-    <div class="elements">
-      <template v-for="item in items">
-        <div class="item" :key="item.id">
-          <strong class="name">Название: {{ item.name }}</strong>
-          <div class="price">Цена: {{ item.price }}</div>
-          <div class="rating">Рейтинг: {{ item.rating }}</div>
-        </div>
-      </template>
-    </div>
-  </div>
-</template>
-
-<script>
+<script type="text/jsx">
+import {homePageStoreGetter,homePageStoreAction} from './state'
+import HomePageItem from "@/pages/HomePageItem.vue";
 export default {
-  name: "HomePage",
-  data() {
-    return {
-      items: [
-        { id: 1, name: "First", price: 100, rating: 0.2 },
-        { id: 2, name: "Second", price: 101, rating: 0.5 },
-        { id: 3, name: "Third", price: 101, rating: 0.9 },
-        { id: 4, name: "Forth", price: 50, rating: 0.6 },
-      ],
-    };
+  computed: {
+    items: homePageStoreGetter.items
   },
-};
+  methods:{
+    sortBy(e){
+      homePageStoreAction.setIsAscSort(e.target.value === 'min-to-max')
+      e.preventDefault()
+    },
+    sortType(e){
+      homePageStoreAction.sortType(e.target.value)
+      e.preventDefault()
+    },
+
+    filterBy(e){
+      homePageStoreAction.setFilteredNames(e.target.value)
+      e.preventDefault()
+    }
+  },
+  render() {
+    const renderList = this.items.map((item)=>{
+      return <HomePageItem key={`home-page-item-${item.id}`} data={item}/>
+
+    })
+    return <div>
+      <div class="nav">
+        Сортировка по:
+        <select onChange={this.sortType}>
+          <option value="none">Нет</option>
+          <option value="price">Цена</option>
+          <option value="rating">Рейтинг</option>
+        </select>
+        <select onChange={this.sortBy}>
+          <option value="min-to-max">По возрастанию</option>
+          <option value="max-to-min">По убыванию</option>
+        </select>
+      </div>
+      <div class="nav">
+        Фильтр по названию:
+        <input onInput={this.filterBy} type="text"/>
+      </div>
+      <hr/>
+      <div class="elements">
+        {renderList}
+      </div>
+  </div>
+
+  }
+}
 </script>
-
-<style>
-.nav {
-  margin: 10px 0;
-}
-.nav-el {
-  margin: 10px;
-}
-.item {
-  margin: 5px 0;
-  padding: 5px;
-  border: 1px solid #000;
-}
-
-select {
-  margin: 0 5px;
-}
-</style>
+<style src="./style.css"></style>
